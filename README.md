@@ -141,15 +141,15 @@ The Random Forest model also predicts **market regimes** or **price movements**,
 ---
 ## Some Results
 - HMM:  
-    - ![HMM - geomteric brownian motion](HMM.jpg)
-    - ![HMM - EURUSD](HMM_EURUSD.jpg)
+    - ![HMM - geomteric brownian motion](docs/HMM.jpg)
+    - ![HMM - EURUSD](docs/HMM_EURUSD.jpg)
 - ANN:
-    - ![ANN - difference index](difference_index_ANN.jpg)
-    - ![ANN - error histogram](error_histogram_ANN.jpg)
-    - ![ANN - regression line](pred_vs_actual_ANN.jpg)
+    - ![ANN - difference index](docs/difference_index_ANN.jpg)
+    - ![ANN - error histogram](docs/error_histogram_ANN.jpg)
+    - ![ANN - regression line](docs/pred_vs_actual_ANN.jpg)
 - RF:
-    - ![RF - error histogram](error_histogram_RF.jpg)
-    - ![RF - regression line](pred_vs_actual_RF.jpg)
+    - ![RF - error histogram](docs/error_histogram_RF.jpg)
+    - ![RF - regression line](docs/pred_vs_actual_RF.jpg)
 ## Acknowledgments  
 
 - **MT5 Python API** for data fetching.  
