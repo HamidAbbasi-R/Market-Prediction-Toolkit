@@ -1,12 +1,6 @@
 #%% IMPORT LIBRARIES
-import pandas as pd
-import numpy as np
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-# from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from datetime import datetime
 import functions as fns
