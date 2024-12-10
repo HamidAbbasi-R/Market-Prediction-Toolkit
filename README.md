@@ -33,22 +33,7 @@ This Python project uses a Hidden Markov Model (HMM) to analyze financial market
 
 ## Installation
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/hmm-financial-analysis.git
-   cd hmm-financial-analysis
-   ```
-
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. Set up **MetaTrader 5**:
-   - Download and install MetaTrader 5.
-   - Create a demo account (e.g., with Pepperstone) to fetch data.
-
-4. Configure your MT5 login details in the code.
+1. Do not needs installation at the moment. Just clone the repository and run the HMMscript.
 
 ---
 
@@ -106,3 +91,6 @@ This Python project uses a Hidden Markov Model (HMM) to analyze financial market
 - **MT5 Python API** for seamless data integration.
 - **hmmlearn** for HMM modeling.
 - **Plotly** for interactive and insightful visualizations.
+
+## Interactive Plotly Chart
+[View the Interactive Chart](https://github.com/HamidAbbasi-R/Market-Prediction-Toolkit/blob/a10a0fbeb880cb28dfb24d7f6c70bef255027048/figure_artificial.html)
