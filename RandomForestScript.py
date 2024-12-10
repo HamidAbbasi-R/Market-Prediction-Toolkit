@@ -72,7 +72,7 @@ features_dict = {
 
 target = 'EMA_log_return'
 forward_target = 0      # 0 means the same day, 1 means the next day, etc.
-test_split = 0.1        # 0.7 means 70% test, 30% train
+test_split = 0.5        # 0.7 means 70% test, 30% train
 
 # get the data
 if fromNow:
@@ -159,7 +159,7 @@ y_pred_test = scaler_y.inverse_transform(y_pred_test_scaled.reshape(-1, 1))
 
 #%% Step 3: Plot the results
 fns.plot_actual_vs_predicted_linear(y_test, y_pred_test, quantile=0.15, fraction=1)
-fns.plot_actual_vs_predicted_linear(y_train, y_pred_train, quantile=0.15, fraction=1)
+fns.plot_actual_vs_predicted_linear(y_train, y_pred_train, quantile=None, fraction=1)
 
 fns.plot_error_histogram(y_test, y_train, y_pred_test, y_pred_train)
 #%% PLOT TIME SERIES (DEBUGGING)
