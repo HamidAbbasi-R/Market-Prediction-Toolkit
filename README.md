@@ -93,4 +93,5 @@ This Python project uses a Hidden Markov Model (HMM) to analyze financial market
 - **Plotly** for interactive and insightful visualizations.
 
 ## Interactive Plotly Chart
-Download and open [figure_artificial.html](figure_artificial.html) in your browser.
+<!-- adding HMM.jpg -->
+![Plotly Figure](HMM.jpg)
