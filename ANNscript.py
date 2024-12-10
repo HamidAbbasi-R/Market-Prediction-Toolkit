@@ -45,113 +45,6 @@ def plot_prediction_actual_time_series(data, indices_test, predictions):
     )
     fig.show(renderer="vscode")
 
-def plot_time_series():
-    fig_subplots = make_subplots(
-        rows=2 if y2 is not None else 1, 
-        cols=1,
-        shared_xaxes=True,
-        vertical_spacing=0.1,
-        # subplot_titles=('Log Return', 'Close Price')
-    )
-
-    # First subplot for log return
-    fig_subplots.add_trace(go.Scatter(
-        x=x,
-        y=data[y1],
-        mode='lines',
-        connectgaps=False,
-        line=dict(
-            color='black',
-            width=1,
-        ),
-    ), row=1, col=1)
-
-    if y1_MA is not None:
-        fig_subplots.add_trace(go.Scatter(
-        x=x,
-        y=data[y1_MA],
-        mode='lines',
-        connectgaps=False,
-        line=dict(
-            color='blue',
-            width=1,
-        ),
-    ), row=1, col=1)
-
-
-    # Second subplot for close price
-    if y2 is not None:
-        fig_subplots.add_trace(go.Scatter(
-            x=x,
-            y=data[y2],
-            mode='lines',
-            line=dict(
-                color='black',
-                width=1,
-            ),
-        ), row=2, col=1)
-
-        if y2_MA is not None:
-            fig_subplots.add_trace(go.Scatter(
-                x=x,
-                y=data[y2_MA],
-                mode='lines',
-                # do not fill gaps
-                connectgaps=False,
-                # name='Log Return'و
-                line=dict(
-                    color='gray',
-                    width=1,
-                ),
-            ), row=2, col=1)
-
-
-    # Update layout
-    fig_subplots.update_layout(
-        title = f'{symbol}, Timeframe={timeFrame}, Nbars={len(data)}',
-        xaxis2_title='Time',
-        yaxis_title=y1,
-        yaxis2_title=y2 if y2 is not None else None,
-        # height=600,
-        showlegend=False,
-    )
-
-    if artificial_returns:
-        # crate a rectangular region for each duration
-        start_i = 0
-        colors = []*len(durations)
-        for i in range(len(durations)):
-            if means_generative[i] > 0:
-                colors.append('green')
-            elif means_generative[i] < 0:
-                colors.append('red')
-            else:
-                colors.append('blue')
-        
-            fig_subplots.add_vrect(
-                x1=data['time'].iloc[start_i:start_i+durations[i]].iloc[-1],
-                x0=data['time'].iloc[start_i:start_i+durations[i]].iloc[0],
-                fillcolor=colors[i],
-                opacity=0.2,
-                layer='below',
-                line_width=0,
-                row=1, col=1
-            )
-
-            fig_subplots.add_vrect(
-                x0=data['time'].iloc[start_i:start_i+durations[i]].iloc[0],
-                x1=data['time'].iloc[start_i:start_i+durations[i]].iloc[-1],
-                fillcolor=colors[i],
-                opacity=0.2,
-                layer='below',
-                line_width=0,
-                row=2, col=1
-            )
-            start_i += durations[i]
-
-
-    fig_subplots.show(renderer='vscode')
-
 #%% Step 0: Set up parameters and get data
 print("Setting up parameters...", end="")
 # data parameters
@@ -177,7 +70,7 @@ features_dict = {
     'open':             False,
     'high':             False,
     'low':              False,
-    'upward':           True,
+    'upward':           False,
 
     # time
     'hour':             False,
@@ -185,7 +78,7 @@ features_dict = {
     # log return
     'log_return':       False,
     'MA_log_return':    False,
-    'EMA_log_return':   False,
+    'EMA_log_return':   True,
     
     # volume
     'volume':           False,
@@ -193,12 +86,12 @@ features_dict = {
     'EMA_volume':       False,
     
     # volatility
-    'volatility':       True,
+    'volatility':       False,
     'MA_volatility':    False,
-    'EMA_volatility':   False,
+    'EMA_volatility':   True,
 
     # Technical indicators
-    'ATR':              False,
+    'ATR':              True,
     'ADX':              False,
     'RSI':              False,
     
@@ -208,7 +101,7 @@ features_dict = {
     'SHY.US':           False,
 }
 
-target = 'upward'
+target = 'EMA_log_return'
 forward_target = 0      # 0 means the same day, 1 means the next day, etc.
 test_split = 0.05        # 0.7 means 70% test, 30% train
 epochs = 500
@@ -253,6 +146,7 @@ data = fns.create_features_and_target(
     features_dict, 
     data, 
     forward_target,
+    target,
     )
 
 # Features (X) and target (y)
@@ -344,7 +238,7 @@ fns.plot_predictions_actual(y_test[:1000], predictions[:1000], target)
 fns.plot_predictions_actual(y_train[:1000], predictions_train[:1000], target)
 
 fns.plot_actual_vs_predicted_linear(y_test, predictions, 0.1)
-fns.plot_actual_vs_predicted_linear(y_train, predictions_train, quantile=0.02, fraction=1)
+fns.plot_actual_vs_predicted_linear(y_train, predictions_train, quantile=None, fraction=1)
 
 fns.plot_error_histogram(y_test, y_train, predictions, predictions_train)
 
@@ -382,7 +276,11 @@ x = data['time']        # or data.index
 y1 = 'log_return'
 y1_MA = None
 
-y2 = 'up'
+y2 = 'close'
 y2_MA = None
 
-plot_time_series()
+fns.plot_time_series(
+    data,
+    x, y1, y1_MA, y2, y2_MA,
+    symbol, timeFrame, 
+    artificial_returns, durations, means_generative)
