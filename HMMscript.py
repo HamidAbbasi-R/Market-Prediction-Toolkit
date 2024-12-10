@@ -1,6 +1,5 @@
 #%% IMPORTS
 import numpy as np
-import pandas_ta as ta
 from datetime import datetime
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -16,34 +15,44 @@ print("Setting up parameters...", end="")
 # data parameters
 symbol='EURUSD'
 fromNow = True
-timeFrame = 'H1'
-Nbars = 10000
+timeFrame = 'M30'
+Nbars = 100000
 endTime = datetime(2024, 10, 30, 16, 0, 0)  # in case fromNow is False
 MA_length = 20
 use_MA_for_log_return = False
 
 # Artificial return values
-artificial_returns = True
-N_repeat = 10
+artificial_returns = False
+N_repeat = 8
 means_generative = [0.005, -0.005, 0]*N_repeat
 covars_generative = [0.002, 0.002, 0.002]*N_repeat
-durations = [500,500,500]*N_repeat
+durations = [450,400,700]*N_repeat
 # for means=0.005 and covars=0.002 'tied' and 'viterbi' or 'map' works well! 
 # But this is trivial.
 
 # HMM parameters
 hiddenStates = 3
-n_iter = 10000
+n_iter = 1000
 covariance_type = 'tied'   # 'spherical', 'diag', 'full', 'tied'
 algorithm = 'viterbi'  # 'viterbi', 'map'
 verbose = True
 training_fraction = 1
 features_dict = {
-    'return':           False,
-    'log_return':       True,
-    'log_volatility':   False,
-    'log_volume':       False,
-    'log_ATR':          False,
+    'return':               False,
+
+    'log_return':           True,
+    'MA_log_return':        False,
+    'EMA_log_return':       False,
+
+    'log_volatility':       True,
+    'MA_log_volatility':    False,
+    'EMA_log_volatility':   False,
+
+    'log_volume':           False,
+    'MA_log_volume':        False,
+    'EMA_log_volume':       False,
+
+    'log_ATR':              False,
 }
 
 # plot parameters
@@ -64,10 +73,6 @@ if artificial_returns:
         covars_generative,
         durations,
         )
-    if use_MA_for_log_return:
-        data['MA'] = data['close'].rolling(MA_length).mean()
-        data['return'] = data['MA'].pct_change()
-        data['log_return'] = np.log(data['MA'] / data['MA'].shift(1))
     features_dict = {
         'return':           False,
         'log_return':       True,
@@ -78,19 +83,17 @@ if artificial_returns:
 else:
     if fromNow:
         endTime = datetime.now()
-    data = fns.GetPriceData(symbol, endTime, timeFrame, Nbars, source='MT5')
-    data['MA'] = data['close'].rolling(MA_length).mean()
-    if use_MA_for_log_return:
-        data['return'] = data['MA'].pct_change()
-        data['log_return'] = np.log(data['MA'] / data['MA'].shift(1))
-    else:
-        data['return'] = data['close'].pct_change()
-        data['log_return'] = np.log(data['close'] / data['close'].shift(1))
-    data['volatility'] = data['log_return'].rolling(20).std()
-    data['ATR'] = ta.atr(data['high'], data['low'], data['close'], length=20)
-
-    data['log_volatility'] = np.log(data['volatility'])
-    data['log_volume'] = np.log(data['tick_volume'])
+    data = fns.GetPriceData(
+        symbol, 
+        endTime, 
+        timeFrame, 
+        Nbars, 
+        indicators_dict={
+            'ATR':     True,
+            'ADX':     False,
+            'RSI':     False,
+            },    
+        source='MT5')
     data['log_ATR'] = np.log(data['ATR'])
 
 print("Done!")
@@ -103,7 +106,7 @@ data, model = fns.TrainHMM_hmmlearn(
     training_fraction = training_fraction,
     hiddenStates=hiddenStates, 
     features_dict=features_dict,
-    n_iter=n_iter, 
+    n_iter=n_iter,
     algorithm=algorithm,
     covariance_type=covariance_type,
     verbose=verbose,
@@ -180,6 +183,7 @@ fig_subplts.update_layout(
     autosize=True,
     # height=1200,
     barmode='overlay',
+    template='seaborn',
     legend=dict(
         title="Traces",  # Optional: Add a title for the legend
         x=1.1,  # Position the legend outside the main plot area for clarity
@@ -226,7 +230,7 @@ print('Done!')
 #%% PLOT HISTOGRAMS (DEBUGGING)
 fig = go.Figure()
 fig.add_trace(go.Histogram(
-    x=data['log_return'],
+    x=data['log_volume'],
     name='volume',
     opacity=0.7,
     ))
@@ -240,100 +244,15 @@ fig.add_trace(go.Histogram(
 fig.show(renderer='vscode')
 
 #%% PLOT TIME SERIES (DEBUGGING)
-fig_subplots = make_subplots(
-    rows=2, cols=1,
-    shared_xaxes=True,
-    vertical_spacing=0.1,
-    # subplot_titles=('Log Return', 'Close Price')
-)
+x = data['time']        # or data.index
+y1 = 'close'
+y1_MA = None
 
-# First subplot for log return
-fig_subplots.add_trace(go.Scatter(
-    x=data['time'],
-    y=data['log_return'],
-    mode='lines',
-    # name='Log Return'و
-    line=dict(
-        color='black',
-        width=1,
-    ),
-), row=1, col=1)
+y2 = 'log_return'
+y2_MA = None
 
-fig_subplots.add_hline(
-    y=0,
-    line=dict(
-        color='black',
-        width=1,
-    ),
-    row=1, col=1
-)
-
-# Second subplot for close price
-fig_subplots.add_trace(go.Scatter(
-    x=data['time'],
-    y=data['close'],
-    mode='lines',
-    # name='Close Price'
-    line=dict(
-        color='black',
-        width=1,
-    ),
-), row=2, col=1)
-if use_MA_for_log_return:
-    fig_subplots.add_trace(go.Scatter(
-        x=data['time'],
-        y=data['MA'],
-        mode='lines',
-        name='MA',
-    ), row=2, col=1)
-
-
-# Update layout
-fig_subplots.update_layout(
-    xaxis2_title='Time',
-    yaxis_title='Log Return',
-    yaxis2_title='Close Price',
-    height=600,
-    # width=600,
-    showlegend=False,
-    # template='plotly_dark',
-)
-
-if artificial_returns:
-    # crate a rectangular region for each duration
-    start_i = 0
-    colors = []*len(durations)
-    for i in range(len(durations)):
-        if means_generative[i] > 0:
-            colors.append('green')
-        elif means_generative[i] < 0:
-            colors.append('red')
-        else:
-            colors.append('blue')
-        
-        fig_subplots.add_vrect(
-            x1=data['time'].iloc[start_i:start_i+durations[i]].iloc[-1],
-            x0=data['time'].iloc[start_i:start_i+durations[i]].iloc[0],
-            fillcolor=colors[i],
-            opacity=0.2,
-            layer='below',
-            line_width=0,
-            row=1, col=1
-        )
-
-        fig_subplots.add_vrect(
-            x0=data['time'].iloc[start_i:start_i+durations[i]].iloc[0],
-            x1=data['time'].iloc[start_i:start_i+durations[i]].iloc[-1],
-            fillcolor=colors[i],
-            opacity=0.2,
-            layer='below',
-            line_width=0,
-            row=2, col=1
-        )
-        start_i += durations[i]
-
-# use plotly_dark theme
-
-# second subplot yaxis is log
-# fig_subplots.update_yaxes(type='log', row=2, col=1)
-fig_subplots.show(renderer='vscode')
+fns.plot_time_series(
+    data,
+    x, y1, y1_MA, y2, y2_MA,
+    symbol, timeFrame, 
+    artificial_returns, durations, means_generative)
