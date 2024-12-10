@@ -1,97 +1,159 @@
-# HMM for Financial Market Regime Detection
+# Financial Market Regime Detection and Prediction
 
-This Python project uses a Hidden Markov Model (HMM) to analyze financial market regimes based on asset price features such as return, volatility, and volume. The tool works with forex, stocks, and crypto data, leveraging the **MetaTrader 5 (MT5) Python API** to fetch data and the **hmmlearn** package to train the HMM.
+This project provides tools to analyze and predict market regimes and asset prices using advanced statistical and machine learning models. It supports financial data for forex, stocks, and cryptocurrencies, working seamlessly with **MetaTrader 5 (MT5)** to fetch historical data.  
 
----
-
-## Features
-
-1. **Flexible Dataframe Support**: 
-   - Works with data ranging from **1-minute to 1-day timeframes**.
-   - Compatible with forex, stocks, and cryptocurrency assets.
-
-2. **Hidden State Analysis**:
-   - Supports any number of hidden states, with **3 hidden states (bullish, bearish, neutral)** recommended for financial narratives.
-   - Allows exploration of the relationship between hidden states and financial features.
-
-3. **Feature Training Options**:
-   - Train the HMM on any combination of the following features:
-     - Return
-     - Log Return
-     - Log Volatility
-     - Log Volume
-     - Log ATR (Average True Range)
-   - **Feature Interplay Analysis**: For example, compare volatility trends across states (e.g., low volatility often aligns with bullish regimes in stocks).
-
-4. **Interactive Visualizations**:
-   - **Histogram Plots**: View the distribution of features within each hidden state.
-   - **Posterior Probability**: 
-     - Plot the posterior probability of each state across feature values (e.g., log return).
-     - Visualize the posterior probability for each data point (e.g., each candle).
+The models implemented include:  
+1. **Hidden Markov Model (HMM)**  
+2. **Artificial Neural Network (ANN)**  
+3. **Random Forest (RF)**  
 
 ---
 
-## Installation
-
-1. Do not needs installation at the moment. Just clone the repository and run the HMMscript.
-
----
-
-## Usage
-
-1. **Fetching Data**:
-   - Fetch data using the MT5 Python API for your preferred asset and timeframe.
-   - Example assets: EUR/USD (forex), BTC/USD (crypto), AAPL (stocks).
-
-2. **Training the HMM**:
-   - Train the model on selected features (e.g., log returns and log volatility).
-   - Specify the number of hidden states (e.g., 3 for bullish, bearish, neutral).
-
-3. **Visualizing Results**:
-   - Use the provided Plotly-powered functions to generate interactive visualizations:
-     - Feature histograms per state.
-     - Posterior probabilities for states across feature values and data points.
+## Table of Contents  
+- [Overview of Models](#overview-of-models)  
+  - [Hidden Markov Model (HMM)](#hidden-markov-model-hmm)  
+  - [Artificial Neural Network (ANN)](#artificial-neural-network-ann)  
+  - [Random Forest (RF)](#random-forest-rf)  
+- [Features](#features)  
+- [Usage](#usage)  
+- [Evaluation Metrics](#evaluation-metrics)  
+- [Visualizations](#visualizations)  
+- [Future Enhancements](#future-enhancements)  
 
 ---
 
-## Example Workflow
+## Overview of Models  
 
-1. Fetch hourly close prices for **BTC/USD**.
-2. Train the HMM on **log returns** and **log volatility** with 3 hidden states.
-3. Analyze the interplay between volatility and regimes:
-   - Verify that bearish regimes align with high volatility.
-   - Validate that bullish regimes correspond to low volatility.
-4. Visualize the results:
-   - Histograms of log returns per state.
-   - Posterior probabilities over time.
-
----
-
-## Insights
-
-- **State Interpretations**:
-  - Bullish: Typically associated with positive returns and low volatility.
-  - Bearish: Usually correlates with negative returns and high volatility.
-  - Neutral: Moderate returns with medium volatility.
-
-- **Cautionary Note**: Misalignment of state characteristics (e.g., bearish with low volatility) may indicate data issues or unexpected market conditions.
+### Hidden Markov Model (HMM)  
+The HMM is used to uncover **hidden market regimes** (e.g., bullish, bearish, neutral) from financial data.  
+- **Features**:  
+    - Return or log return  
+    - Log volatility  
+    - Log volume  
+    - Log ATR
+    - Any other relevant financial, technical, or macroeconomic indicators.  
+- **Visualizations**:  
+    - Histograms of features for each hidden state  
+    - Posterior probabilities for hidden states across data points  
+- **Insights**:  
+    - Analyze the interplay between hidden states and features.
+    - Bullish: Typically associated with positive returns and low volatility.
+    - Bearish: Usually correlates with negative returns and high volatility.
+    - Neutral: Moderate returns with medium volatility.
+- **Cautionary Note**: Misalignment of state characteristics (e.g., bearish with low volatility) may indicate data issues or unexpected market conditions.  
 
 ---
 
-## Future Enhancements
-
-- Support for additional features (e.g., technical indicators).
-- Optimization of state-transition probabilities.
-- Incorporation of advanced HMM variants (e.g., Bayesian HMM).
+### Artificial Neural Network (ANN)  
+The ANN model predicts **price movements** by learning from lagged feature data.  
+- **Input Features**:  
+    - Lagged values of:  
+        - Return or log return  
+        - Volatility or log volatility  
+        - Volume or log volume  
+        - Technical indicators (e.g., RSI, ADX, ATR)  
+        - Macroeconomic indicators (e.g., S&P 500, Treasury bond rates, Real Estate ETF)  
+    - Use EMA features instead of raw values for better fit. Accuracy of the model will be lower if EMA is used, but it will be more robust. For instance, the raw log return values are more noisy than the EMA values.  
+- **Architecture**:  
+    - Customizable number of layers and number of hidden neurons in each layer to balance complexity and performance. Hyperparameter tuning is recommended for optimal results.
+- **Usage**:  
+    - Target could be close price, or return. It is recommended that return values should be used as target since they are stationary as opposed to close prices.
 
 ---
 
-## Acknowledgments
+### Random Forest (RF)  
+The Random Forest model also predicts **market regimes** or **price movements**, leveraging the robustness of ensemble methods.  
+- **Input Features**:  
+    - Same as ANN (lagged financial, technical, and macroeconomic indicators). 
+    - Again, use lagged EMA features instead of raw values for better performance. 
+- **Architectures**:
+    - Number of trees and tree depth can be adjusted for optimal performance.  
+    - Hyperparameter tuning is recommended for better results.
+- **Advantages**:  
+    - Handles non-linear relationships and noisy data effectively.  
+    - Provides feature importance for better interpretability.
+    - Can be used to determine which features behave close to each other.
 
-- **MT5 Python API** for seamless data integration.
-- **hmmlearn** for HMM modeling.
-- **Plotly** for interactive and insightful visualizations.
+---
 
-## Interactive Plotly Chart
-<!-- adding HMM.jpg -->
-![Plotly Figure](HMM.jpg)
+## Features  
+
+1. **Wide Range of Inputs**:  
+    - Financial data: Forex, stocks, crypto. MT5 API for data fetching. Yfinance can also be used alternatively.
+    - Indicators: pandas_ta and macroeconomic variables.  
+
+2. **Customizable Timeframes**:  
+    - Works on data from **as small as 1-minute to 1-week timeframes**.  
+
+3. **Multi-Model Flexibility**:  
+    - HMM for market regime classification.  
+    - ANN and RF for predictive tasks.  
+
+4. **MetaTrader 5 Integration**:  
+    - Fetch data with the MT5 Python API using demo accounts (e.g., Pepperstone).  
+
+5. **Interactive Visualizations**:  
+    - HMM state analysis.  
+    - ANN and RF error and regression diagnostics.  
+
+---
+
+## Usage  
+
+1. Fetch data using MT5 Python API.  
+2. Run the selected model:  
+    - HMM: Uncover hidden regimes.  
+    - ANN or RF: Predict future market regimes or asset prices.  
+3. Train the model on selected features.  
+4. Visualize the results using the built-in plotting functions.  
+
+---
+
+## Evaluation Metrics  
+
+1. **HMM**:  
+    - Histogram of features by hidden state.  
+    - Posterior probabilities across data points.  
+
+2. **ANN and RF**:  
+    - **Error Histogram**: Distribution of prediction errors.  
+    - **Regression Line**: Compare predictions to actual values.  
+    - **Feature Importance (RF only)**: Identify which features impact predictions the most.  
+
+---
+
+## Visualizations  
+
+- Interactive **Plotly Dashboards**:  
+    - Explore feature histograms, regression lines, and error metrics interactively using Plotly.
+
+---
+
+## Future Enhancements  
+
+- Feature engineering for ANN and RF models. 
+- Optimize ANN architecture for specific asset types.  
+- Integrate advanced HMMs (e.g., Bayesian or hierarchical models).
+- Integrate with backtesting platforms for strategy testing.
+
+---
+## Some Results
+- HMM:  
+    - ![HMM - geomteric brownian motion](HMM.jpg)
+    - ![HMM - EURUSD](HMM_EURUSD.jpg)
+- ANN:
+    - ![ANN - difference index](difference_index_ANN.jpg)
+    - ![ANN - error histogram](error_histogram_ANN.jpg)
+    - ![ANN - regression line](pred_vs_actual_ANN.jpg)
+- RF:
+    - ![RF - error histogram](error_histogram_RF.jpg)
+    - ![RF - regression line](pred_vs_actual_RF.jpg)
+## Acknowledgments  
+
+- **MT5 Python API** for data fetching.  
+- **hmmlearn**, **scikit-learn**, and **PyTorch** for model implementations.  
+- **Plotly** for interactive visualizations.  
+
+---
+
+Feel free to contribute or report issues. Let’s decode the markets together! 🚀  
