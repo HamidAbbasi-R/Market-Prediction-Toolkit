@@ -5,16 +5,16 @@ from datetime import datetime
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from plotly.io import renderers
+from datetime import datetime
 import importlib
 import functions as fns
 # reload the functions module
 importlib.reload(fns)
 
-
 #%% USER INPUTS
 print("Setting up parameters...", end="")
 # data parameters
-symbol='USDCHF'
+symbol='EURUSD'
 fromNow = True
 timeFrame = 'H1'
 Nbars = 10000
@@ -24,16 +24,17 @@ use_MA_for_log_return = False
 
 # Artificial return values
 artificial_returns = True
-N_repeat = 3
-means_generative = [-0.0005, 0.0005, 0]*N_repeat
-covars_generative = [0.02, 0.02, 0.02]*N_repeat
-durations = [1000,2000,1000]*N_repeat
-
+N_repeat = 10
+means_generative = [0.005, -0.005, 0]*N_repeat
+covars_generative = [0.002, 0.002, 0.002]*N_repeat
+durations = [500,500,500]*N_repeat
+# for means=0.005 and covars=0.002 'tied' and 'viterbi' or 'map' works well! 
+# But this is trivial.
 
 # HMM parameters
 hiddenStates = 3
-n_iter = 5000
-covariance_type = 'full'   # 'spherical', 'diag', 'full', 'tied'
+n_iter = 10000
+covariance_type = 'tied'   # 'spherical', 'diag', 'full', 'tied'
 algorithm = 'viterbi'  # 'viterbi', 'map'
 verbose = True
 training_fraction = 1
@@ -155,21 +156,6 @@ if show_candlesticks:
 print('Done!')
 #%% RENDER FIGURES
 print('Rendering figures...', end=' ')
-def add_traces_with_legendgroup(subplot, figure, row, col, existing_trace_names):
-    for trace in figure.data:
-        # If the trace name is already in the legend, don't show the legend for this trace
-        if trace.name in existing_trace_names:
-            trace.showlegend = False
-        else:
-            existing_trace_names.add(trace.name)  # Track unique trace names
-            trace.showlegend = True  # Ensure legend entry is displayed
-        trace.legendgroup = trace.name  # Set legendgroup to trace name for unified control
-        subplot.add_trace(trace, row=row, col=col)
-    # Set axis titles for each subplot
-    subplot.update_xaxes(title_text=figure.layout.xaxis.title.text, row=row, col=col)
-    subplot.update_yaxes(title_text=figure.layout.yaxis.title.text, row=row, col=col)
-    # show the legend
-    subplot.update_layout(showlegend=True)
 
 # Keep track of legend entries to avoid duplicates
 existing_trace_names = set()
@@ -185,7 +171,7 @@ for i, figure in enumerate(figs):
         continue
     row = int(i // 2 + 1)
     col = int(i % 2 + 1)
-    add_traces_with_legendgroup(fig_subplts, figure, row=row, col=col, existing_trace_names=existing_trace_names)
+    fns.add_traces_with_legendgroup(fig_subplts, figure, row=row, col=col, existing_trace_names=existing_trace_names)
 
 fig_subplts.update_layout(
     showlegend=True,
@@ -266,7 +252,11 @@ fig_subplots.add_trace(go.Scatter(
     x=data['time'],
     y=data['log_return'],
     mode='lines',
-    # name='Log Return'
+    # name='Log Return'و
+    line=dict(
+        color='black',
+        width=1,
+    ),
 ), row=1, col=1)
 
 fig_subplots.add_hline(
@@ -284,13 +274,18 @@ fig_subplots.add_trace(go.Scatter(
     y=data['close'],
     mode='lines',
     # name='Close Price'
+    line=dict(
+        color='black',
+        width=1,
+    ),
 ), row=2, col=1)
-fig_subplots.add_trace(go.Scatter(
-    x=data['time'],
-    y=data['MA'],
-    mode='lines',
-    name='MA',
-), row=2, col=1)
+if use_MA_for_log_return:
+    fig_subplots.add_trace(go.Scatter(
+        x=data['time'],
+        y=data['MA'],
+        mode='lines',
+        name='MA',
+    ), row=2, col=1)
 
 
 # Update layout
