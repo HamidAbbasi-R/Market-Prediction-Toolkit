@@ -11,14 +11,16 @@ The models implemented include:
 
 ## Table of Contents  
 - [Overview of Models](#overview-of-models)  
-  - [Hidden Markov Model (HMM)](#hidden-markov-model-hmm)  
-  - [Artificial Neural Network (ANN)](#artificial-neural-network-ann)  
-  - [Random Forest (RF)](#random-forest-rf)  
+    - [Hidden Markov Model (HMM)](#hidden-markov-model-hmm)  
+    - [Artificial Neural Network (ANN)](#artificial-neural-network-ann)  
+    - [Random Forest (RF)](#random-forest-rf)  
 - [Features](#features)  
 - [Usage](#usage)  
 - [Evaluation Metrics](#evaluation-metrics)  
 - [Visualizations](#visualizations)  
 - [Future Enhancements](#future-enhancements)  
+- [Some Results](#some-results)
+
 
 ---
 
