@@ -140,16 +140,27 @@ The Random Forest model also predicts **market regimes** or **price movements**,
 
 ---
 ## Some Results
-- HMM:  
-    - ![HMM - geomteric brownian motion](docs/HMM.jpg)
-    - ![HMM - EURUSD](docs/HMM_EURUSD.jpg)
-- ANN:
-    - ![ANN - difference index](docs/difference_index_ANN.jpg)
-    - ![ANN - error histogram](docs/error_histogram_ANN.jpg)
-    - ![ANN - regression line](docs/pred_vs_actual_ANN.jpg)
-- RF:
-    - ![RF - error histogram](docs/error_histogram_RF.jpg)
-    - ![RF - regression line](docs/pred_vs_actual_RF.jpg)
+### HMM:  
+Three different regimes are separated by the HMM model. Posterior probabilities are shown for each value of observation (in this case H4 log return of EURUSD). It is clear that the model is able to separate the regimes effectively for the given aritificial data. 
+![HMM - geomteric brownian motion](docs/HMM.jpg)
+When using real data the regime separation is not as clear as the artificial data. The model is still able to separate some of the regimes effectively. But the separated regimes are not necessarily the same as the expected regimes. We expected the separated regimes to be bullish, bearish, and neutral. But the separated regimes are high, medium, and low volatility. My guess is that the transition matrices are not well initialized. I tried to use a random initialization for the transition matrices but didn't get any better results. Most of the time the model does not converge. Overall my observation is that the model is very sensitive to the initialization of the transition matrices, covariance matrices, and means. For initialization, the following code is used:
+```python
+model.transmat_ = np.array([
+    [main_diag[0], (1 - main_diag[0]) / 2, (1 - main_diag[0]) / 2],
+    [(1 - main_diag[1]) / 2, main_diag[1], (1 - main_diag[1]) / 2],
+    [(1 - main_diag[2]) / 2, (1 - main_diag[2]) / 2, main_diag[2]]
+])
+``` 
+![HMM - EURUSD](docs/HMM_EURUSD.jpg)
+### ANN:
+The graphs below shows the difference between actual and predicted values for the ANN model.
+![ANN - difference index](docs/difference_index_ANN.jpg)
+![ANN - error histogram](docs/error_histogram_ANN.jpg)
+![ANN - regression line](docs/pred_vs_actual_ANN.jpg)
+### RF:
+The graphs below shows the difference between actual and predicted values for the RF model.
+![RF - error histogram](docs/error_histogram_RF.jpg)
+![RF - regression line](docs/pred_vs_actual_RF.jpg)
 ## Acknowledgments  
 
 - **MT5 Python API** for data fetching.  
@@ -157,5 +168,3 @@ The Random Forest model also predicts **market regimes** or **price movements**,
 - **Plotly** for interactive visualizations.  
 
 ---
-
-Feel free to contribute or report issues. Let’s decode the markets together! 🚀  
