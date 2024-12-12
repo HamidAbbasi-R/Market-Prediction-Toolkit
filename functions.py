@@ -648,25 +648,6 @@ def TrainHMM_hmmlearn(
     for feature, use_feature in features_dict.items():
         if use_feature:
             features.append(np.array(data[feature]))
-
-    # if features_dict['return']:
-    #     features.append(np.array(data['return']))
-    # if features_dict['log_return']:
-    #     features.append(np.array(data['log_return']))
-    # if features_dict['log_volatility']:
-    #     features.append(np.array(data['log_volatility']))
-    # if features_dict['log_volume']:
-    #     features.append(np.array(data['log_volume']))
-    # if features_dict['log_ATR']:
-    #     features.append(np.array(data['log_ATR']))
-    # if features_dict['EMA_log_return']:
-    #     features.append(np.array(data['EMA_log_return']))
-    # if features_dict['EMA_log_volatility']:
-    #     features.append(np.array(data['EMA_log_volatility']))
-    # if features_dict['MA_log_volatility']:
-    #     features.append(np.array(data['MA_log_volatility']))
-    # if features_dict['MA_log_return']:
-    #     features.append(np.array(data['MA_log_return']))
     
     X = np.column_stack(features) if features else np.empty((len(data), 0))
 
