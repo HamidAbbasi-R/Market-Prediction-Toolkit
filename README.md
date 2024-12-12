@@ -81,7 +81,7 @@ One important aspect of ANN is to choose the right features. One metric that sho
 Notice that the highest and the lowest correlation are 0.01 and -0.03 respectively. This is a good sign in my view because the features are not correlated with each other and each of them can provide different information to the model.  
 Now compare it to the correlation matrix when exponential moving averages of log returns are used as features:
 
-![Correlation Matrix](docs/correlation_matrix_EMA_log_return.png)
+![Correlation Matrix](docs/correlation_matrix_ema_log_return.png)
 
 As expected, the correlation between the lagged EMA features are much larger than that of the raw lagged features. This is because of the nature of the EMA that gives more weight to the recent values. That is why using EMA features are probably not that much helpful at least in this fashion in my opinion. Simply because the correlation between the features are too high.
 
