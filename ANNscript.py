@@ -50,7 +50,7 @@ print("Setting up parameters...", end="")
 # data parameters
 symbol='EURUSD'        # 'EURUSD' or 'MSFT.US' or 'MSFT.US-24'
 fromNow = True
-timeFrame = 'D1'
+timeFrame = 'H4'
 Nbars = 10000
 endTime = datetime(2024, 10, 30, 16, 0, 0)  # in case fromNow is False
 MA_period = 20
@@ -63,7 +63,7 @@ covars_generative = [0.02, 0.02, 0.02]*N_repeat
 durations = [500,500,500]*N_repeat
 
 # ML parameters
-lookback = 5
+lookback = 20
 features_dict = {
     # price
     'close':            False,
@@ -88,10 +88,10 @@ features_dict = {
     # volatility
     'volatility':       False,
     'MA_volatility':    False,
-    'EMA_volatility':   True,
+    'EMA_volatility':   False,
 
     # Technical indicators
-    'ATR':              True,
+    'ATR':              False,
     'ADX':              False,
     'RSI':              False,
     

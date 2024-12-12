@@ -1,6 +1,6 @@
-# Financial Market Regime Detection and Prediction
+# Machine Learning Tools for Market Regime Analysis and Price Prediction
 
-This project provides tools to analyze and predict market regimes and asset prices using advanced statistical and machine learning models. It supports financial data for forex, stocks, and cryptocurrencies, working seamlessly with **MetaTrader 5 (MT5)** to fetch historical data.  
+This project provides tools to analyze and predict market regimes and asset prices using advanced statistical and machine learning models. The aim is not to be as comprehensive as possible but to provide a starting point for further research. It supports financial data for forex, stocks, and cryptocurrencies, working with **MetaTrader 5 (MT5)** to fetch historical data.  
 
 The models implemented include:  
 1. **Hidden Markov Model (HMM)**  
@@ -42,7 +42,11 @@ The HMM is used to uncover **hidden market regimes** (e.g., bullish, bearish, ne
     - Bullish: Typically associated with positive returns and low volatility.
     - Bearish: Usually correlates with negative returns and high volatility.
     - Neutral: Moderate returns with medium volatility.
-- **Cautionary Note**: Misalignment of state characteristics (e.g., bearish with low volatility) may indicate data issues or unexpected market conditions.  
+
+**Cautionary Note**: When HMM is trained on two sets of features (e.g., return and volatility), the relationship between the features are important. For example, if bearish regimes are associated with high volatility, the model will (ideally) learn this relationship. So it is important to choose features that have a relationship with each other in all the regimes. For another example, let's say volume is to be used as a feature in addition to return and volatility. The user should ask themselves if the volume the following questions:
+> In bearish regimes, when returns are negative and volatility is high, does volume follow a certain pattern? If yes, then volume can be used as a feature. If not, then it is not a good idea to use volume as a feature. 
+
+After all, each hidden state should be associated with a certain pattern of features. Meaning to say, all features should be separated by the hidden states.  
 
 ---
 
@@ -60,6 +64,32 @@ The ANN model predicts **price movements** by learning from lagged feature data.
     - Customizable number of layers and number of hidden neurons in each layer to balance complexity and performance. Hyperparameter tuning is recommended for optimal results.
 - **Usage**:  
     - Target could be close price, or return. It is recommended that return values should be used as target since they are stationary as opposed to close prices.
+
+For ANN it is extremely important to normalize the data. The following code is used to normalize the data:
+```python
+from sklearn.preprocessing import MinMaxScaler
+scaler_X = MinMaxScaler()
+scaler_y = MinMaxScaler()
+X = scaler_X.fit_transform(X)
+y = scaler_y.fit_transform(y.reshape(-1, 1))
+```
+
+One important aspect of ANN is to choose the right features. One metric that should always be checked in my view is the correlation between the features. If two features are highly correlated, one of them should be removed. The reduncancy in information will not help the model to learn the patterns and it only increases the complexity of the model. To visually see the correlation between different features, one can use `plot_features_correlation_matrix` function. The matrix looks something like this when lagged log returns are used as features:
+
+![Correlation Matrix](docs/correlation_matrix_log_return.png)
+
+Notice that the highest and the lowest correlation are 0.01 and -0.03 respectively. This is a good sign in my view because the features are not correlated with each other and each of them can provide different information to the model.  
+Now compare it to the correlation matrix when exponential moving averages of log returns are used as features:
+
+![Correlation Matrix](docs/correlation_matrix_EMA_log_return.png)
+
+As expected, the correlation between the lagged EMA features are much larger than that of the raw lagged features. This is because of the nature of the EMA that gives more weight to the recent values. That is why using EMA features are probably not that much helpful at least in this fashion in my opinion. Simply because the correlation between the features are too high.
+
+Below the correlation between two features are shown for both EMA version and raw version of log returns.
+
+Raw log return |  EMA log return
+-- | --
+![](docs/binary_relation_log_return.png)  |  ![](docs/binary_relation_ema_log_return.png)
 
 ---
 
